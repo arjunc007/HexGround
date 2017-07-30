@@ -10,10 +10,12 @@ public class HexGrid : MonoBehaviour {
 	public int y = 5;
 	public float separation = 0.01f;
 
-	private Ray ray = new Ray();
 	private Transform boardHolder;
 	private List<Tile> tileList;
 	private float offsetX, offsetY;
+	private int playerTurn = 1;
+	private int p1Score = 0;
+	private int p2Score = 0;
 
 	public const float outerRadius = 0.5f;
 	public const float innerRadius = outerRadius * 0.866025404f; //Root 3 / 2
@@ -31,18 +33,29 @@ public class HexGrid : MonoBehaviour {
 
 		for (int i = 0; i < tileList.Count; i++)
 			tileList [i].SetupTile ();
+
+		Debug.Log ("Player " + playerTurn + "'s Turn");
 	}
 
 	void Update()
 	{
-		
 		if (Input.GetMouseButtonDown (0)) 
 		{
 			Tile clickedTile = GetClickedTile (Input.mousePosition);
 
-			if (clickedTile != null) 
+			if (clickedTile != null && clickedTile.owner == 0) 
 			{
-				clickedTile.ChangeColor ();
+				clickedTile.ChangeColor (playerTurn);
+				playerTurn = playerTurn == 1 ? ++playerTurn : --playerTurn;
+			}
+
+			Debug.Log ("Player " + playerTurn + "'s Turn");
+
+			if (CheckBoard ()) 
+			{
+				CalculateScore ();
+				Debug.Log ("Player 1 Score: " + p1Score);
+				Debug.Log ("Player 2 Score: " + p2Score);
 			}
 		}
 	}
@@ -94,5 +107,27 @@ public class HexGrid : MonoBehaviour {
 		}
 
 		return null;
+	}
+
+	private bool CheckBoard()
+	{
+		foreach (Tile tile in tileList) 
+		{
+			if (tile.owner == 0)
+				return false;
+		}
+
+		return true;
+	}
+
+	private void CalculateScore()
+	{
+		foreach (Tile tile in tileList) 
+		{
+			if (tile.owner == 1)
+				p1Score++;
+			if (tile.owner == 2)
+				p2Score++;
+		}
 	}
 }

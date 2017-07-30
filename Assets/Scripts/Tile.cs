@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour {
 
-	public List<GameObject> neighbourList = new List<GameObject> ();
+	public List<Tile> neighbourList = new List<Tile> ();
 
 	private CircleCollider2D circleCollider2D;
 
-	private int owner = 0;
+	public int owner = 0;
 	private Animator anim;
-	private Renderer renderer;
+	//private Renderer renderer;
 
 	public void SetupTile()
 	{
 		anim = GetComponent<Animator> ();
-		renderer = GetComponent<Renderer> ();
+		//renderer = GetComponent<Renderer> ();
 
 		circleCollider2D = GetComponent<CircleCollider2D> ();
 		circleCollider2D.radius = HexGrid.outerRadius;
@@ -34,27 +34,51 @@ public class Tile : MonoBehaviour {
 			//Debug.Log ("Enter foreach");
 			if (collider.name == "HexagonTile(Clone)" && collider.transform.position != transform.position) 
 			{
-				neighbourList.Add (collider.gameObject);
+				neighbourList.Add (collider.GetComponent<Tile> ());
 			}
 		}
 	}
 
-	public void ChangeColor()
+	public void ChangeColor(int player)
 	{
-		Debug.Log (owner);
-
-		if (owner == 0) 
+		if (owner == 0) {
+			if (player == 1) {
+				anim.SetTrigger ("GrayToBlue");
+			} else if (player == 2) {
+				anim.SetTrigger ("GrayToRed");
+			}
+			//renderer.material.color = Color.blue;
+		} 
+		else if (owner == 1 && player != 1) 
 		{
-			anim.SetTrigger ("GrayToBlue");
-			owner = 1;
-			renderer.material.color = Color.blue;
-
-		} else if (owner == 1) 
+			anim.SetTrigger ("BlueToRed");
+		} 
+		else if(owner == 2 && player != 2)
 		{
-			Debug.Log ("Blue to Gray");
-			anim.SetTrigger ("BlueToGray");
-			owner = 0;
-			renderer.material.color = Color.gray;
+			anim.SetTrigger ("RedToBlue");
+			//renderer.material.color = Color.gray;
+		}
+
+		owner = player;
+		ChangeNeighbors ();
+	}
+
+	void ChangeNeighbors ()
+	{
+		foreach (Tile neighbor in neighbourList) 
+		{
+			if (neighbor.owner == 0 || neighbor.owner == owner)
+				continue;
+			else if (neighbor.owner == 1) 
+			{
+				neighbor.anim.SetTrigger ("BlueToRed");
+				neighbor.owner = 2;
+			} 
+			else if(neighbor.owner == 2)
+			{
+				neighbor.anim.SetTrigger ("RedToBlue");
+				neighbor.owner = 1;
+			}
 		}
 	}
 }
