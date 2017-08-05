@@ -10,12 +10,10 @@ public class Tile : MonoBehaviour {
 
 	public int owner = 0;
 	private Animator anim;
-	//private Renderer renderer;
 
 	public void SetupTile()
 	{
 		anim = GetComponent<Animator> ();
-		//renderer = GetComponent<Renderer> ();
 
 		circleCollider2D = GetComponent<CircleCollider2D> ();
 		circleCollider2D.radius = HexGrid.outerRadius;
@@ -31,7 +29,6 @@ public class Tile : MonoBehaviour {
 
 		foreach(Collider2D collider in hitColliders)
 		{
-			//Debug.Log ("Enter foreach");
 			if (collider.name == "HexagonTile(Clone)" && collider.transform.position != transform.position) 
 			{
 				neighbourList.Add (collider.GetComponent<Tile> ());
@@ -47,7 +44,6 @@ public class Tile : MonoBehaviour {
 			} else if (player == 2) {
 				anim.SetTrigger ("GrayToRed");
 			}
-			//renderer.material.color = Color.blue;
 		} 
 		else if (owner == 1 && player != 1) 
 		{
@@ -56,7 +52,6 @@ public class Tile : MonoBehaviour {
 		else if(owner == 2 && player != 2)
 		{
 			anim.SetTrigger ("RedToBlue");
-			//renderer.material.color = Color.gray;
 		}
 
 		owner = player;
